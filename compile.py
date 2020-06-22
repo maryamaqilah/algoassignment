@@ -3,7 +3,7 @@ from priodict import priorityDictionary
 import pprint
 import gmplot
 
-key = 'AIzaSyAMS6L4_a3OtVmbwG1P4NEzEXiLQqgpN6A'
+key = 'insert google api key'
 navigation = googlemaps.Client(key)
 
 # initialize map
