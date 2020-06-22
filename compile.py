@@ -69,7 +69,7 @@ print("KLIA: " + str(klia))
 kliac = str(klia[0]['geometry']['location']['lat']) + ',' + str(klia[0]['geometry']['location']['lng'])
 # print(kliac)
 
-print('Overall time travel by ome mode of transport:')
+print('Overall distance travelled with one mode of transport:')
 print('By road:')
 road = navigation.directions(origin, dest, mode='driving')
 print(road[0]['legs'][0]['distance']['text'])
