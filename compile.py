@@ -1,9 +1,9 @@
 import googlemaps
 from priodict import priorityDictionary
-import pprint
 import gmplot
+import sys
 
-key = 'insert google api key'
+key = 'AIzaSyAMS6L4_a3OtVmbwG1P4NEzEXiLQqgpN6A'
 navigation = googlemaps.Client(key)
 
 # initialize map
@@ -11,8 +11,8 @@ gmp = gmplot.GoogleMapPlotter(2.9264, 101.6964, 11, key)
 
 # origin = input('start: ')
 # dest = input('where to?: ')
-origin = 'Universiti Malaya'
-dest = 'Kuala Lumpur International Airport, 64000 Sepang, Selangor'
+origin = 'University Malaya'
+dest = 'KLIA'
 
 # number 1
 print('Number 1:')
@@ -57,10 +57,6 @@ bu = navigation.geocode('MRT Bandar Utama')
 print("Bandar Utama: " + str(bu))
 buc = str(bu[0]['geometry']['location']['lat']) + ',' + str(bu[0]['geometry']['location']['lng'])
 # print(buc)
-# ou = navigation.geocode('1 Utama Shopping Centre, Lot S327, Bandar Utama City Centre No1, Lebuh Bandar Utama, Bandar Utama, 47800 Petaling Jaya, Selangor')
-# # print(ou)
-# ouc = str(ou[0]['geometry']['location']['lat']) + ',' + str(ou[0]['geometry']['location']['lng'])
-# # print(ouc)
 lg = navigation.geocode('Gombak LRT Station')
 print("LRT Gombak: " + str(lg))
 lgc = str(lg[0]['geometry']['location']['lat']) + ',' + str(lg[0]['geometry']['location']['lng'])
@@ -69,13 +65,13 @@ print("KLIA: " + str(klia))
 kliac = str(klia[0]['geometry']['location']['lat']) + ',' + str(klia[0]['geometry']['location']['lng'])
 # print(kliac)
 
-print('Overall distance travelled with one mode of transport:')
+print('Overall time travel by ome mode of transport:')
 print('By road:')
 road = navigation.directions(origin, dest, mode='driving')
 print(road[0]['legs'][0]['distance']['text'])
-print('By public transport (train+bus):')
-publ = navigation.directions(origin, dest, mode='transit')
-print(publ[0]['legs'][0]['distance']['text'])
+# print('By public transport (train+bus):')
+# publ = navigation.directions(origin, dest, mode='transit')
+# print(publ[0]['legs'][0]['distance']['text'])
 print('By feet:')
 walk = navigation.directions(origin, dest, mode='walking')
 print(walk[0]['legs'][0]['distance']['text'])
@@ -155,34 +151,31 @@ print(str(ksph))
 ksklia = navigation.distance_matrix(ksc, kliac, mode='driving')
 dksklia = ksklia['rows'][0]['elements'][0]['distance']['value']
 print(str(ksklia))
-# pdbu = navigation.directions(pdc, buc, mode='transit')
-# dpdbu = int(pdbu[0]['legs'][0]['distance']['value'])
-# buou = navigation.distance_matrix(buc, ouc, mode='walking')
-# dbuou = int(buou['rows'][0]['elements'][0]['distance']['value'])
-# ouklia = navigation.distance_matrix(ouc, kliac, mode='transit', transit_mode='bus')
-# print(ouklia)
-# douklia = ouklia['rows'][0]['elements'][0]['distance']['value']
-# print(douklia)
-# buklia = navigation.directions(buc, kliac, mode='transit', transit_mode='bus')
-# dbuklia = int(buklia[0]['legs'][0]['distance']['value'])
-# mnklia = navigation.directions(mnc, klia, mode="driving")
-# dmnklia = int(mnklia[0]['legs'][0]['distance']['value'])
-# phklia = navigation.directions(phc, kliac, mode='transit')
-# dphklia = int(phklia[0]['legs'][0]['distance']['value'])
 
 Graph = {
     'University Malaya': {'LRT Kerinchi': dumlk, 'LRT Universiti': dlklu, 'MRT Phileo': dlupd, 'Bukit Angkasa': dumba},
-    'LRT Kerinchi': {'KL Sentral': dlkks, 'LRT Putra Heights': dlkph, 'Gombak LRT Station': dlklg},
-    'LRT Universiti': {'KL Sentral': dluks, 'LRT Putra Heights': dksph},
-    'MRT Phileo': {'MRT Muzium Negara': dpdmn, 'MRT Bandar Utama': dmnbu},
+    'LRT Kerinchi': {'KL Sentral': dlkks, 'Gombak LRT Station': dlklg},
+    'LRT Universiti': {'KL Sentral': dluks},
+    'MRT Phileo': {'MRT Muzium Negara': dpdmn},
     'KL Sentral': {'KLIA': dksklia},
-    'LRT Putra Heights': {},
-    'MRT Muzium Negara': {'KL Sentral': dmnks, 'MRT Bandar Utama': dmnbu},
-    'MRT Bandar Utama': {},
+    'MRT Muzium Negara': {'KL Sentral': dmnks},
     'Bukit Angkasa': {'Flat PKNS Kerinchi': dbafpk},
     'Flat PKNS Kerinchi': {'LRT Kerinchi': dfpklk},
-    'Gombak LRT Station': {'KL Sentral': dlgks}
-    # 'One Utama Bus Terminal': {'KLIA': douklia}
+    'Gombak LRT Station': {'KL Sentral': dlgks},
+    'KLIA':{}
+}
+
+Tgraph = {
+    'University Malaya': {'LRT Kerinchi': 'Bus', 'LRT Universiti': 'Walk', 'MRT Phileo': 'Bus', 'Bukit Angkasa': 'Bus'},
+    'LRT Kerinchi': {'KL Sentral': 'Train', 'Gombak LRT Station': 'Train'},
+    'LRT Universiti': {'KL Sentral': 'Train'},
+    'MRT Phileo': {'MRT Muzium Negara': 'Bus'},
+    'KL Sentral': {'KLIA': 'Drive'},
+    'MRT Muzium Negara': {'KL Sentral': 'Walk'},
+    'Bukit Angkasa': {'Flat PKNS Kerinchi': 'Bus'},
+    'Flat PKNS Kerinchi': {'LRT Kerinchi': 'Walk'},
+    'Gombak LRT Station': {'KL Sentral': 'Train'},
+    'KLIA': {}
 }
 
 def Dijkstra(Graph, start, end=None):
@@ -206,7 +199,6 @@ def Dijkstra(Graph, start, end=None):
 
     return (D, P)
 
-
 def shortestPath(Graph, start, end):
     """
     Find a single shortest path from the given start vertex to the given
@@ -224,27 +216,65 @@ def shortestPath(Graph, start, end):
     Path.reverse ()
     return Path
 
-
-def find_all_paths(allpath, start, end, path=[]):
+required = []
+def find_all_paths(Graph, Tgraph, start, end, path=None, pathlen=0, mod=None):
+    if path is None:
+        path = []
+        mod = []
     path = path + [start]
     if start == end:
-        return [path]
-    paths = []
-    for node in allpath[start]:
-        if node not in path:
-            newpaths = find_all_paths (allpath, node, end, path)
-        for newpath in newpaths:
-            paths.append (newpath)
-    return paths
+        for node, mode in Tgraph[start].items():
+            for i in path:
+                    if node == path[i]:
+                        mod.append(mode)
+        yield path, pathlen, mod
+    if not start in Graph:
+        yield [], 0, []
+        return
 
-print ('\nAll paths: ')
-pprint.pprint(find_all_paths(Graph, 'University Malaya', 'KLIA'))
+    for node, val in Graph[start].items():
+        if node not in path:
+            yield from find_all_paths(Graph, Tgraph, node, end, path, pathlen + val, mod)
+
+    # for node, mode in Tgraph[start].items():
+    #     if node in path:
+    #         mod.append(mode)
+    #         yield from find_all_paths(Graph, Tgraph, node, end, path, pathlen + val, mod)
+
+def exists_in_graph(Graph, nodes):
+    for node in nodes:
+        if not node in Graph:
+            return False
+    return True
+
+if not exists_in_graph(Graph, [origin, dest] + required):
+    print('Bad data!')
+    sys.exit()
+
+# print(Graph['University Malaya'].items())
+print('\nPossible paths: ')
+all_paths = find_all_paths(Graph, Tgraph, origin, dest)
+lens = []
+paths = []
+modes = []
+
+for path, pathlen, mod in all_paths:
+    if exists_in_graph(path, required):
+        print(path, '~', pathlen/1000, 'km', mod)
+        paths.append(path)
+        lens.append(pathlen/1000)
+        modes.append(mod)
+
+print(all_paths)
+# print(lens)
+# print(paths)
+# print(modes)
+
 print ('\nThe shortest path is: ')
 print (shortestPath (Graph, 'University Malaya', 'KLIA'))
 
 # number 3
 print('\nNumber 3:')
-
 # straight line
 lat_straight = [(um[0]['geometry']['location']['lat']), (klia[0]['geometry']['location']['lat'])]
 long_straight = [(um[0]['geometry']['location']['lng']), (klia[0]['geometry']['location']['lng'])]
